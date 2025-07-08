@@ -68,6 +68,9 @@ backend/uploads/*.webm
 # Frontend specific (React Native)
 frontend/.expo/
 frontend/.expo-shared/
+expo-env.d.ts
+frontend/web-build/
+.metro-health-check*
 frontend/android/app/build/
 frontend/android/.gradle/
 frontend/ios/Pods/
