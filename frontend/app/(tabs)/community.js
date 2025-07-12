@@ -431,6 +431,501 @@ export default function CommunityScreen() {
     if (!item || !item.author) {
       return null;
     }
-  
-  }
-  
+
+    return (
+      <View className="bg-white rounded-lg mx-4 mb-4 shadow-sm border border-gray-100">
+        {/* Post Header */}
+        <View className="flex-row items-center p-4 pb-3">
+          <View className="w-12 h-12 bg-gray-300 rounded-full mr-3 items-center justify-center">
+            <Text className="text-gray-600 font-semibold">
+              {item.author?.name?.charAt(0) || "U"}
+            </Text>
+          </View>
+          <View className="flex-1">
+            <View className="flex-row items-center">
+              <Text className="font-semibold text-gray-900 mr-2">
+                {item.author?.name || "Unknown User"}
+              </Text>
+              {item.author?.isVerified && (
+                <Ionicons name="checkmark-circle" size={16} color="#3b82f6" />
+              )}
+            </View>
+            <Text className="text-gray-500 text-sm">
+              {new Date(item.createdAt).toLocaleDateString()}
+            </Text>
+          </View>
+          {item.author?._id && user?._id && item.author._id === user._id && (
+            <TouchableOpacity onPress={() => showPostOptions(item)}>
+              <Ionicons name="ellipsis-horizontal" size={20} color="#6b7280" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Post Content */}
+        {editingPostId === item._id ? (
+          <View className="px-4 pb-3">
+            <TextInput
+              value={editingPostContent}
+              onChangeText={setEditingPostContent}
+              multiline
+              maxLength={2000}
+              className="bg-gray-50 border border-blue-500 rounded-lg p-3 text-gray-900 min-h-[80px]"
+              placeholder="Edit your post..."
+              autoFocus
+            />
+            <View className="flex-row mt-2">
+              <TouchableOpacity
+                onPress={() => handleUpdatePost(item._id)}
+                className="bg-blue-600 rounded-full px-4 py-2 mr-2"
+              >
+                <Text className="text-white font-semibold">Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleCancelEdit}
+                className="bg-gray-300 rounded-full px-4 py-2"
+              >
+                <Text className="text-gray-700 font-semibold">Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <View className="px-4 pb-3">
+            <Text className="text-gray-900 leading-5">{item.content}</Text>
+            {item.isEdited && (
+              <Text className="text-gray-400 text-xs mt-1">(edited)</Text>
+            )}
+
+            {/* Hashtags */}
+            {item.hashtags && item.hashtags.length > 0 && (
+              <Text className="text-blue-600 mt-2">
+                {item.hashtags.map((tag) => `#${tag}`).join(" ")}
+              </Text>
+            )}
+          </View>
+        )}
+
+        {/* Post Image (if exists) */}
+        {item.images && item.images.length > 0 && (
+          <View>
+            {item.images.length === 1 ? (
+              <Image
+                source={{
+                  uri: `${getStaticImageBaseUrl()}${item.images[0].url}`,
+                }}
+                className="w-full h-64 bg-gray-200"
+                resizeMode="cover"
+              />
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {item.images.map((image, index) => (
+                  <Image
+                    key={index}
+                    source={{ uri: `${getStaticImageBaseUrl()}${image.url}` }}
+                    className="w-64 h-64 bg-gray-200 mr-2"
+                    resizeMode="cover"
+                  />
+                ))}
+              </ScrollView>
+            )}
+          </View>
+        )}
+
+        {/* Post Stats */}
+        <View className="flex-row items-center px-4 py-2 border-t border-gray-100">
+          <Text className="text-gray-600 text-sm flex-1">
+            {item.likeCount || 0} likes
+          </Text>
+          <Text className="text-gray-600 text-sm">
+            {item.commentCount || 0} comments
+          </Text>
+          <Text className="text-gray-600 text-sm ml-4">
+            {item.shareCount || 0} shares
+          </Text>
+        </View>
+
+        {/* Action Buttons */}
+        <View className="flex-row items-center px-4 py-3 border-t border-gray-100">
+          <TouchableOpacity
+            onPress={() => handleLikePost(item._id)}
+            className="flex-row items-center flex-1 justify-center py-1"
+          >
+            <Ionicons
+              name={
+                item.likes?.some((like) => like.user === user?._id)
+                  ? "heart"
+                  : "heart-outline"
+              }
+              size={20}
+              color={
+                item.likes?.some((like) => like.user === user?._id)
+                  ? "#ef4444"
+                  : "#6b7280"
+              }
+            />
+            <Text
+              className={`ml-2 font-medium ${
+                item.likes?.some((like) => like.user === user?._id)
+                  ? "text-red-500"
+                  : "text-gray-600"
+              }`}
+            >
+              Like
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => handleOpenComments(item._id, item.commentCount)}
+            className="flex-row items-center flex-1 justify-center py-1"
+          >
+            <Ionicons name="chatbubble-outline" size={20} color="#6b7280" />
+            <Text className="text-gray-600 ml-2 font-medium">Comment</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity className="flex-row items-center flex-1 justify-center py-1">
+            <Ionicons name="share-outline" size={20} color="#6b7280" />
+            <Text className="text-gray-600 ml-2 font-medium">Share</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View className="flex-1">
+        {/* Header with gradient extending to notch */}
+        <LinearGradient
+          colors={["#2563eb", "#1d4ed8"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          className="pt-12 pb-4"
+        >
+          <SafeAreaView
+            edges={[]}
+            className="px-6 flex-row items-center justify-between"
+          >
+            <View>
+              <Text className="text-white text-2xl font-bold">Community</Text>
+              <Text className="text-blue-100 text-sm">
+                Connect with fellow surfers
+              </Text>
+            </View>
+            <View className="flex-row space-x-3">
+              <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
+                <Ionicons name="search" size={24} color="#ffffff" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push("/messenger")}>
+                <Ionicons name="chatbubbles" size={24} color="#ffffff" />
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+        </LinearGradient>
+
+        {/* Search Bar */}
+        {showSearch && (
+          <View className="bg-white mx-4 mt-4 p-4 rounded-lg shadow-sm border border-gray-100">
+            <View className="flex-row items-center mb-3">
+              <View className="flex-1 flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
+                <Ionicons name="search" size={20} color="#6b7280" />
+                <TextInput
+                  value={searchQuery}
+                  onChangeText={(text) => {
+                    setSearchQuery(text);
+                    debouncedSearch(text);
+                  }}
+                  placeholder="Search users..."
+                  className="flex-1 ml-2 text-gray-900"
+                  autoFocus
+                />
+              </View>
+              <TouchableOpacity onPress={clearSearch} className="ml-3 p-2">
+                <Ionicons name="close" size={20} color="#6b7280" />
+              </TouchableOpacity>
+            </View>
+
+            {searchLoading && (
+              <View className="py-4">
+                <ActivityIndicator size="small" color="#3b82f6" />
+              </View>
+            )}
+
+            {searchResults.length > 0 && (
+              <ScrollView className="max-h-60">
+                {searchResults.map((searchUser) => (
+                  <TouchableOpacity
+                    key={searchUser._id}
+                    onPress={() => {
+                      router.push(`/userProfile?userId=${searchUser._id}`);
+                      clearSearch();
+                    }}
+                    className="flex-row items-center py-3 border-b border-gray-100"
+                  >
+                    <View className="w-10 h-10 bg-gray-300 rounded-full mr-3 items-center justify-center">
+                      {searchUser.profilePicture ? (
+                        <Image
+                          source={{
+                            uri: `${getStaticImageBaseUrl()}${
+                              searchUser.profilePicture
+                            }`,
+                          }}
+                          className="w-10 h-10 rounded-full"
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <Text className="text-gray-600 font-semibold">
+                          {searchUser.name?.charAt(0) || "U"}
+                        </Text>
+                      )}
+                    </View>
+                    <View className="flex-1">
+                      <Text className="font-medium text-gray-900">
+                        {searchUser.name}
+                      </Text>
+                      {searchUser.username && (
+                        <Text className="text-gray-500 text-sm">
+                          @{searchUser.username}
+                        </Text>
+                      )}
+                    </View>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={20}
+                      color="#9ca3af"
+                    />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
+
+            {searchQuery.trim() &&
+              !searchLoading &&
+              searchResults.length === 0 && (
+                <View className="py-4">
+                  <Text className="text-gray-500 text-center">
+                    No users found
+                  </Text>
+                </View>
+              )}
+          </View>
+        )}
+
+        <View className="flex-1 bg-gray-50">
+          {/* Add missing ActivityIndicator import */}
+          <FlatList
+            data={posts}
+            renderItem={renderPost}
+            keyExtractor={(item) => item._id}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            ListHeaderComponent={
+              showCreatePost ? (
+                /* Create Post */
+                <View className="bg-white mx-4 mt-4 mb-4 rounded-lg p-4 shadow-sm border border-gray-100">
+                  <View className="flex-row items-start">
+                    <View className="w-10 h-10 bg-gray-300 rounded-full mr-3 items-center justify-center">
+                      <Text className="text-gray-600 font-semibold">
+                        {user?.name?.charAt(0) || "U"}
+                      </Text>
+                    </View>
+                    <View className="flex-1">
+                      <TextInput
+                        value={postContent}
+                        onChangeText={setPostContent}
+                        placeholder="What's on your mind?"
+                        className="bg-gray-100 rounded-lg px-4 py-3 text-gray-900 min-h-[80px]"
+                        multiline
+                        textAlignVertical="top"
+                        placeholderTextColor="#9ca3af"
+                      />
+                      <View className="flex-row justify-end mt-3 space-x-2">
+                        <TouchableOpacity
+                          onPress={() => {
+                            setShowCreatePost(false);
+                            setPostContent("");
+                          }}
+                          className="bg-gray-500 rounded-lg py-2 px-4"
+                        >
+                          <Text className="text-white font-medium">Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={handleCreatePost}
+                          className="bg-blue-600 rounded-lg py-2 px-4"
+                        >
+                          <Text className="text-white font-medium">Post</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              ) : null
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+
+        {/* Comments Bottom Sheet */}
+        <CommentsBottomSheet
+          isVisible={commentsVisible}
+          onClose={handleCloseComments}
+          postId={selectedPostId}
+          commentCount={selectedPostCommentCount}
+          onCommentAdded={handleCommentAdded}
+        />
+
+        {/* Floating Action Button */}
+        <TouchableOpacity
+          onPress={() => setShowCreatePostModal(true)}
+          className="absolute bottom-6 right-6 w-14 h-14 bg-blue-600 rounded-full items-center justify-center shadow-lg elevation-8"
+          style={{
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 4,
+            },
+            shadowOpacity: 0.3,
+            shadowRadius: 4.65,
+          }}
+        >
+          <Ionicons name="add" size={28} color="#ffffff" />
+        </TouchableOpacity>
+
+        {/* Facebook-style Create Post Modal */}
+        <Modal
+          visible={showCreatePostModal}
+          animationType="slide"
+          presentationStyle="pageSheet"
+        >
+          <View className="flex-1 bg-white">
+            {/* Modal Header */}
+            <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-200">
+              <TouchableOpacity onPress={() => setShowCreatePostModal(false)}>
+                <Text className="text-gray-600 text-lg">Cancel</Text>
+              </TouchableOpacity>
+              <Text className="text-lg font-semibold text-gray-900">
+                Create Post
+              </Text>
+              <TouchableOpacity
+                onPress={handleCreatePostWithMedia}
+                className={`px-4 py-2 rounded-lg ${
+                  modalPostContent.trim() || selectedMedia.length > 0
+                    ? "bg-blue-600"
+                    : "bg-gray-300"
+                }`}
+                disabled={
+                  !modalPostContent.trim() && selectedMedia.length === 0
+                }
+              >
+                <Text
+                  className={`font-medium ${
+                    modalPostContent.trim() || selectedMedia.length > 0
+                      ? "text-white"
+                      : "text-gray-500"
+                  }`}
+                >
+                  Post
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView className="flex-1 px-4">
+              {/* User Info */}
+              <View className="flex-row items-center py-4">
+                <View className="w-12 h-12 bg-gray-300 rounded-full mr-3 items-center justify-center">
+                  <Text className="text-gray-600 font-semibold">
+                    {user?.name?.charAt(0) || "U"}
+                  </Text>
+                </View>
+                <View>
+                  <Text className="font-semibold text-gray-900">
+                    {user?.name || "Unknown User"}
+                  </Text>
+                  <View className="flex-row items-center mt-1">
+                    <Ionicons name="globe-outline" size={16} color="#6b7280" />
+                    <Text className="text-gray-500 text-sm ml-1">Public</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Text Input */}
+              <TextInput
+                value={modalPostContent}
+                onChangeText={setModalPostContent}
+                placeholder="What's on your mind?"
+                className="text-gray-900 text-lg min-h-[120px] mb-4"
+                multiline
+                textAlignVertical="top"
+                placeholderTextColor="#9ca3af"
+                style={{ fontSize: 18 }}
+              />
+
+              {/* Media Preview */}
+              {selectedMedia.length > 0 && (
+                <View className="mb-4">
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {selectedMedia.map((media, index) => (
+                      <View key={index} className="mr-3 relative">
+                        <Image
+                          source={{ uri: media.uri }}
+                          className="w-32 h-32 rounded-lg"
+                          resizeMode="cover"
+                        />
+                        <TouchableOpacity
+                          onPress={() => removeMedia(index)}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-gray-800 rounded-full items-center justify-center"
+                        >
+                          <Ionicons name="close" size={16} color="#ffffff" />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Add to Post Options */}
+              <View className="border border-gray-200 rounded-lg p-4 mb-4">
+                <Text className="text-gray-900 font-medium mb-3">
+                  Add to your post
+                </Text>
+                <View className="flex-row items-center justify-between">
+                  <TouchableOpacity
+                    onPress={pickMedia}
+                    className="flex-row items-center flex-1 justify-center py-3 bg-gray-50 rounded-lg mr-2"
+                  >
+                    <Ionicons name="image" size={24} color="#22c55e" />
+                    <Text className="text-gray-700 ml-2 font-medium">
+                      Photo/Video
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity className="flex-row items-center flex-1 justify-center py-3 bg-gray-50 rounded-lg ml-2">
+                    <Ionicons name="location" size={24} color="#ef4444" />
+                    <Text className="text-gray-700 ml-2 font-medium">
+                      Location
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View className="flex-row items-center justify-between mt-3">
+                  <TouchableOpacity className="flex-row items-center flex-1 justify-center py-3 bg-gray-50 rounded-lg mr-2">
+                    <Ionicons name="happy" size={24} color="#f59e0b" />
+                    <Text className="text-gray-700 ml-2 font-medium">
+                      Feeling
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity className="flex-row items-center flex-1 justify-center py-3 bg-gray-50 rounded-lg ml-2">
+                    <Ionicons name="people" size={24} color="#3b82f6" />
+                    <Text className="text-gray-700 ml-2 font-medium">
+                      Tag People
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
+        </Modal>
+      </View>
+    </GestureHandlerRootView>
+  );
+}
