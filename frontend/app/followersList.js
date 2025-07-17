@@ -93,4 +93,68 @@ export default function FollowersListScreen() {
       </View>
     </TouchableOpacity>
   );
+
+  return (
+    <View className="flex-1">
+      {/* Header */}
+      <LinearGradient
+        colors={["#2563eb", "#1d4ed8"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        className="pt-12 pb-4"
+      >
+        <SafeAreaView
+          edges={[]}
+          className="px-6 flex-row items-center justify-between"
+        >
+          <View className="flex-row items-center flex-1">
+            <TouchableOpacity onPress={() => router.back()} className="mr-4">
+              <Ionicons name="arrow-back" size={24} color="#ffffff" />
+            </TouchableOpacity>
+            <Text className="text-white text-xl font-bold">
+              {type === "followers" ? "Followers" : "Following"}
+            </Text>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+
+      <View className="flex-1 bg-gray-50">
+        {isLoading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#3b82f6" />
+            <Text className="text-gray-600 mt-2">Loading...</Text>
+          </View>
+        ) : users.length > 0 ? (
+          <FlatList
+            data={users}
+            renderItem={renderUser}
+            keyExtractor={(item) => item._id}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            contentContainerStyle={{ paddingVertical: 16 }}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <View className="flex-1 justify-center items-center">
+            <Ionicons
+              name={
+                type === "followers" ? "people-outline" : "person-add-outline"
+              }
+              size={64}
+              color="#9ca3af"
+            />
+            <Text className="text-gray-500 text-lg mt-4">
+              No {type === "followers" ? "followers" : "following"} yet
+            </Text>
+            <Text className="text-gray-400 text-center mt-2 px-8">
+              {type === "followers"
+                ? "When people follow this account, they'll appear here"
+                : "When this account follows people, they'll appear here"}
+            </Text>
+          </View>
+        )}
+      </View>
+    </View>
+  );
 }
