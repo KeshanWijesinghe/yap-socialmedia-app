@@ -74,7 +74,7 @@ const getUserPosts = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const posts = await Post.find({ author: userId })
-      .populate("author", "name username avatar")
+      .populate("author", "name username avatar profilePicture")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -255,7 +255,7 @@ const toggleLike = async (req, res) => {
     }
 
     await post.save();
-    await post.populate("author", "name username avatar");
+    await post.populate("author", "name username avatar profilePicture");
 
     const postObj = post.toObject();
 
@@ -357,7 +357,7 @@ const addComment = async (req, res) => {
     });
 
     await comment.save();
-    await comment.populate("author", "name username avatar");
+    await comment.populate("author", "name username avatar profilePicture");
 
     // Add comment to post
     post.comments.push(comment._id);
@@ -450,12 +450,12 @@ const getComments = async (req, res) => {
       post: postId,
       parentComment: null, // Get only top-level comments
     })
-      .populate("author", "name username avatar")
+      .populate("author", "name username avatar profilePicture")
       .populate({
         path: "replies",
         populate: {
           path: "author",
-          select: "name username avatar",
+          select: "name username avatar profilePicture",
         },
         options: { limit: 5, sort: { createdAt: 1 } },
       })
@@ -633,7 +633,7 @@ const updateComment = async (req, res) => {
     comment.content = content;
     comment.isEdited = true;
     await comment.save();
-    await comment.populate("author", "name username avatar");
+    await comment.populate("author", "name username avatar profilePicture");
 
     res.json({
       status: "success",

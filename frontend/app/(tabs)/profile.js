@@ -128,7 +128,12 @@ export default function ProfileScreen() {
           edges={[]}
           className="px-6 flex-row items-center justify-between"
         >
-          <Text className="text-white text-2xl font-bold">Profile</Text>
+          <View>
+            <Text className="text-white text-2xl font-bold">Profile</Text>
+            {user?.name && (
+              <Text className="text-blue-100 text-m mt-1">{user.name}</Text>
+            )}
+          </View>
           <TouchableOpacity onPress={handleLogout}>
             <Ionicons name="settings" size={24} color="#ffffff" />
           </TouchableOpacity>

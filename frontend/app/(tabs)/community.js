@@ -436,10 +436,22 @@ export default function CommunityScreen() {
       <View className="bg-white rounded-lg mx-4 mb-4 shadow-sm border border-gray-100">
         {/* Post Header */}
         <View className="flex-row items-center p-4 pb-3">
-          <View className="w-12 h-12 bg-gray-300 rounded-full mr-3 items-center justify-center">
-            <Text className="text-gray-600 font-semibold">
-              {item.author?.name?.charAt(0) || "U"}
-            </Text>
+          <View className="w-12 h-12 bg-gray-300 rounded-full mr-3 items-center justify-center overflow-hidden">
+            {item.author?.profilePicture ? (
+              <Image
+                source={{
+                  uri: `${getStaticImageBaseUrl()}${
+                    item.author.profilePicture
+                  }`,
+                }}
+                className="w-full h-full"
+                resizeMode="cover"
+              />
+            ) : (
+              <Text className="text-gray-600 font-semibold">
+                {item.author?.name?.charAt(0) || "U"}
+              </Text>
+            )}
           </View>
           <View className="flex-1">
             <View className="flex-row items-center">
