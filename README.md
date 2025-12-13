@@ -1,5 +1,14 @@
 # Yap Social Media App
 
+> **⚠️ Project Status: In Development**  
+> This project is currently under active development and is not yet 100% complete. Some features are still being implemented or refined.
+>
+> **Known Incomplete Features:**
+>
+> - Share Post functionality
+> - Forgot Password / Password Reset
+> - Some UI/UX enhancements in progress
+
 A full-stack social media application with real-time messaging, post sharing, toxicity detection, and community features.
 
 ## 📱 Features
