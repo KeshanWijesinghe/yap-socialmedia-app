@@ -176,6 +176,28 @@ const CommentsBottomSheet = ({
     );
   };
 
+  const handleCommentLongPress = (comment) => {
+    const isOwner = user?._id === comment.author?._id;
+
+    if (!isOwner) return;
+
+    Alert.alert("Comment Options", "What would you like to do?", [
+      {
+        text: "Edit",
+        onPress: () => handleEditComment(comment),
+      },
+      {
+        text: "Delete",
+        onPress: () => handleDeleteComment(comment._id),
+        style: "destructive",
+      },
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+    ]);
+  };
+
   const renderComment = ({ item }) => {
     const isEditing = editingCommentId === item._id;
     const isOwner = user?._id === item.author?._id;
@@ -191,8 +213,12 @@ const CommentsBottomSheet = ({
 
         {/* Comment Content */}
         <View className="flex-1">
-          <View className="bg-gray-100 rounded-xl px-3 py-2">
-            <View className="flex-row items-center justify-between">
+          <TouchableOpacity
+            onLongPress={() => handleCommentLongPress(item)}
+            activeOpacity={0.7}
+            delayLongPress={500}
+          >
+            <View className="bg-gray-100 rounded-xl px-3 py-2">
               <Text className="font-semibold text-gray-900 text-sm">
                 {item.author?.name || "Unknown User"}
                 {item.isEdited && (
@@ -202,60 +228,44 @@ const CommentsBottomSheet = ({
                   </Text>
                 )}
               </Text>
-              {isOwner && !isEditing && (
-                <View className="flex-row">
-                  <TouchableOpacity
-                    onPress={() => handleEditComment(item)}
-                    className="ml-2"
-                  >
-                    <Ionicons name="pencil" size={16} color="#6b7280" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleDeleteComment(item._id)}
-                    className="ml-2"
-                  >
-                    <Ionicons name="trash" size={16} color="#ef4444" />
-                  </TouchableOpacity>
+
+              {isEditing ? (
+                <View className="mt-2">
+                  <TextInput
+                    value={editingContent}
+                    onChangeText={setEditingContent}
+                    multiline
+                    maxLength={500}
+                    className="text-gray-900 bg-white rounded-lg px-2 py-1"
+                    autoFocus
+                  />
+                  <View className="flex-row mt-2">
+                    <TouchableOpacity
+                      onPress={() => handleUpdateComment(item._id)}
+                      className="bg-blue-600 rounded px-3 py-1 mr-2"
+                    >
+                      <Text className="text-white text-xs font-semibold">
+                        Save
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setEditingCommentId(null);
+                        setEditingContent("");
+                      }}
+                      className="bg-gray-300 rounded px-3 py-1"
+                    >
+                      <Text className="text-gray-700 text-xs font-semibold">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
+              ) : (
+                <Text className="text-gray-800 mt-1">{item.content}</Text>
               )}
             </View>
-
-            {isEditing ? (
-              <View className="mt-2">
-                <TextInput
-                  value={editingContent}
-                  onChangeText={setEditingContent}
-                  multiline
-                  maxLength={500}
-                  className="text-gray-900 bg-white rounded-lg px-2 py-1"
-                  autoFocus
-                />
-                <View className="flex-row mt-2">
-                  <TouchableOpacity
-                    onPress={() => handleUpdateComment(item._id)}
-                    className="bg-blue-600 rounded px-3 py-1 mr-2"
-                  >
-                    <Text className="text-white text-xs font-semibold">
-                      Save
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setEditingCommentId(null);
-                      setEditingContent("");
-                    }}
-                    className="bg-gray-300 rounded px-3 py-1"
-                  >
-                    <Text className="text-gray-700 text-xs font-semibold">
-                      Cancel
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ) : (
-              <Text className="text-gray-800 mt-1">{item.content}</Text>
-            )}
-          </View>
+          </TouchableOpacity>
 
           {/* Comment Actions */}
           {!isEditing && (
