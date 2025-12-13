@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "SurfCeylon",
-    "slug": "surf-ceylon",
+    "name": "Yap",
+    "slug": "yap",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "surfceylon",
+    "scheme": "yap",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",

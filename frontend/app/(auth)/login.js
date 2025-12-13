@@ -50,7 +50,7 @@ export default function LoginScreen() {
     setIsLoading(false);
 
     if (result.success) {
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/community");
     } else {
       Alert.alert("Login Failed", result.error);
     }

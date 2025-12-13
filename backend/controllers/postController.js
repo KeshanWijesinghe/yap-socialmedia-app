@@ -33,8 +33,9 @@ const getFeed = async (req, res) => {
         const postObj = post.toObject();
         return {
           ...postObj,
-          author: post.author,
           commentCount,
+          likeCount: post.likes?.length || 0,
+          shareCount: post.shares?.length || 0,
         };
       })
     );
@@ -85,8 +86,9 @@ const getUserPosts = async (req, res) => {
         const postObj = post.toObject();
         return {
           ...postObj,
-          author: post.author,
           commentCount,
+          likeCount: post.likes?.length || 0,
+          shareCount: post.shares?.length || 0,
         };
       })
     );
@@ -255,11 +257,17 @@ const toggleLike = async (req, res) => {
     await post.save();
     await post.populate("author", "name username avatar");
 
+    const postObj = post.toObject();
+
     res.json({
       status: "success",
       message: existingLike ? "Post unliked" : "Post liked",
       data: {
-        post,
+        post: {
+          ...postObj,
+          likeCount: post.likes?.length || 0,
+          shareCount: post.shares?.length || 0,
+        },
         liked: !existingLike,
       },
     });

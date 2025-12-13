@@ -81,7 +81,7 @@ export default function RegisterScreen() {
     setIsLoading(false);
 
     if (result.success) {
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/community");
     } else {
       Alert.alert("Registration Failed", result.error);
     }

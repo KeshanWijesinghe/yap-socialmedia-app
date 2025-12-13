@@ -84,7 +84,8 @@ postSchema.virtual("commentCount").get(function () {
   return this.comments.length;
 });
 
-// Ensure virtuals are included in JSON output
+// Ensure virtuals are included in JSON output and toObject
 postSchema.set("toJSON", { virtuals: true });
+postSchema.set("toObject", { virtuals: true });
 
 module.exports = mongoose.model("Post", postSchema);
