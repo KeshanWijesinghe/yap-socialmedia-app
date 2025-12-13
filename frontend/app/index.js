@@ -50,7 +50,7 @@ export default function SplashScreen() {
     if (!isLoading) {
       setTimeout(() => {
         if (isAuthenticated) {
-          router.replace("/(tabs)");
+          router.replace("/(tabs)/community");
         } else {
           router.replace("/(auth)/login");
         }
@@ -91,10 +91,10 @@ export default function SplashScreen() {
 
         {/* App Title */}
         <Text className="text-white text-4xl font-bold text-center mb-2">
-          SURF CEYLON
+          YAP
         </Text>
         <Text className="text-blue-100 text-lg font-medium tracking-wide">
-          THE SMART SURF APP
+          THE SMART SOCIAL APP
         </Text>
       </Animated.View>
 
@@ -107,27 +107,6 @@ export default function SplashScreen() {
         className="absolute bottom-20"
       >
         <View className="w-10 h-10 border-4 border-white border-t-transparent rounded-full" />
-      </Animated.View>
-
-      {/* Background Decorative Elements */}
-      <Animated.View
-        style={{
-          opacity: fadeAnim,
-          transform: [{ scale: scaleAnim }],
-        }}
-        className="absolute top-20 right-10"
-      >
-        <Text className="text-blue-200 text-6xl opacity-20">🌊</Text>
-      </Animated.View>
-
-      <Animated.View
-        style={{
-          opacity: fadeAnim,
-          transform: [{ scale: scaleAnim }],
-        }}
-        className="absolute bottom-40 left-10"
-      >
-        <Text className="text-blue-200 text-4xl opacity-20">🏄‍♂️</Text>
       </Animated.View>
     </LinearGradient>
   );
